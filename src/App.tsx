@@ -1,26 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { TaskController } from './controllers/TaskController';
+import TaskListView from './views/TaskListView';
 import './App.css';
 
-function App() {
+const taskController = new TaskController();
+
+const App: React.FC = () => {
+  const [inputValue, setInputValue] = useState<string>('');
+  const [tasks, setTasks] = useState(taskController.getAllTasks());
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleAddTask = () => {
+    if (inputValue.trim() !== '') {
+      taskController.addTask(inputValue);
+      setTasks(taskController.getAllTasks());
+      setInputValue('');
+    }
+  };
+
+  const handleToggleTask = (id: number) => {
+    taskController.toggleTask(id);
+    setTasks(taskController.getAllTasks());
+  };
+
+  const handleDeleteTask = (id: number) => {
+    taskController.deleteTask(id);
+    setTasks(taskController.getAllTasks());
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Lista de Tareas</h1>
+      <div className="input-container">
+        <input
+          type="text"
+          placeholder="Escribe una tarea..."
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+        <button onClick={handleAddTask}>Añadir Tarea</button>
+      </div>
+      <TaskListView
+        tasks={tasks}
+        onToggleTask={handleToggleTask}
+        onDeleteTask={handleDeleteTask}
+      />
     </div>
   );
-}
+};
 
 export default App;
